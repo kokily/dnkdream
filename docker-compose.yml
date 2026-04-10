@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  # 1. PostgreSQL 데이터베이스
+  db:
+    image: postgres:15-alpine
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+
+  # 2. Nest.js 백엔드
+  backend:
+    build: ./backend
+    restart: always
+    environment:
+      # DB 컨테이너와 연결
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432${POSTGRES_DB}
+    depends_on:
+      - db
+
+  # 3. Vite React 프론트엔드 (SSR)
+  frontend:
+    build: ./frontend
+    restart: always
+    depends_on:
+      - backend
+
+  # 4. Nginx 리버스 프록시
+  nginx:
+    image: nginx:alpine
+    restart: always
+    ports:
+      - "80:80"
+      # - "443:443" 이후 SSL 적용시 주석 해제
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - backend
+      - frontend
