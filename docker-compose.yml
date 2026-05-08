@@ -26,6 +26,12 @@ services:
   frontend:
     build: ./frontend
     restart: always
+    environment:
+      - NODE_ENV=development
+    command: npm run dev
+    volumes:
+      - ./frontend:/app # frontend 폴더와 docker /app 폴더 실시간 동기화
+      - /app/node_modules
     depends_on:
       - backend
 
