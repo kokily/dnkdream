@@ -1,30 +1,37 @@
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Category } from "./category.entity";
 
-@Entity()
+// 포스트의 상태 구분 Enum
+export enum PostStatus {
+  DRAFT     = 'DRAFT',
+  PUBLISHED = 'PUBLISHED',
+}
+
+@Entity('posts')
 export class Post {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column({ length: 255 })
+  @Column({ nullable: true })
   title!: string;
 
-  @Column('text')
+  @Column({ type: 'text', nullable: true })
   content!: string;
 
-  @Column({ nullable: true })
-  thumbnail!: string;
-
-  @Column('text', { array: true, default: [] })
+  @Column('simple-array', { nullable: true })
   tags!: string[];
 
-  @Column({ default: false })
-  isPublished!: boolean;
+  @Column({ type: 'enum', enum: PostStatus, default: PostStatus.DRAFT })
+  status!: PostStatus;
+
+  @ManyToOne(() => Category, category => category.posts, {
+    nullable: true,
+    onDelete: 'CASCADE',
+  })
+  category!: Category;
+
+  @Column()
+  categoryId!: number;
 
   @CreateDateColumn()
   createdAt!: Date;
