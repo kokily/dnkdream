@@ -10,5 +10,4 @@ RUN npm run build
 
 EXPOSE 3000
 
-# Nest.js Production
 CMD ["npm", "run", "start:prod"]

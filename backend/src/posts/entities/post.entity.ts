@@ -1,9 +1,8 @@
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Category } from "./category.entity";
 
-// 포스트의 상태 구분 Enum
 export enum PostStatus {
-  DRAFT     = 'DRAFT',
+  DRAFT = 'DRAFT',
   PUBLISHED = 'PUBLISHED',
 }
 
@@ -24,14 +23,14 @@ export class Post {
   @Column({ type: 'enum', enum: PostStatus, default: PostStatus.DRAFT })
   status!: PostStatus;
 
-  @ManyToOne(() => Category, category => category.posts, {
-    nullable: true,
-    onDelete: 'CASCADE',
-  })
-  category!: Category;
+  @Column({ nullable: true })
+  categoryId!: number | null;
 
-  @Column()
-  categoryId!: number;
+  @ManyToOne(() => Category, (category) => category.posts, {
+    nullable: true,
+    onDelete: 'SET NULL',
+  })
+  category!: Category | null;
 
   @CreateDateColumn()
   createdAt!: Date;
