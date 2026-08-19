@@ -20,3 +20,15 @@ export async function listPosts() {
 }
 
 export type PostListItem = Awaited<ReturnType<typeof listPosts>>[number];
+
+export async function getPostBySlug(slug: string) {
+  return prisma.post.findUnique({
+    where: { slug },
+    include: {
+      tags: {
+        select: { name: true },
+        orderBy: { name: "asc" },
+      },
+    },
+  });
+}
