@@ -49,6 +49,15 @@ export default function SiteHeader({ isAdmin }: { isAdmin: boolean }) {
           })}
 
           {isAdmin && (
+            <Link
+              href="/write"
+              className={linkClass(pathname.startsWith("/write"))}
+            >
+              글 작성
+            </Link>
+          )}
+
+          {isAdmin && (
             <form action={logoutAction}>
               <button
                 type="submit"
@@ -87,6 +96,15 @@ export default function SiteHeader({ isAdmin }: { isAdmin: boolean }) {
               {item.label}
             </Link>
           ))}
+
+          {isAdmin && (
+            <Link
+              href="/write"
+              className={linkClass(pathname.startsWith("/write"))}
+            >
+              글 작성
+            </Link>
+          )}
 
           {isAdmin && (
             <form action={logoutAction}>

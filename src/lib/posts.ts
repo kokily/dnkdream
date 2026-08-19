@@ -73,9 +73,19 @@ export async function listCategories() {
 
 export type PostListItem = Awaited<ReturnType<typeof listPosts>>[number];
 
+function normalizeSlug(slug: string) {
+  try {
+    return decodeURIComponent(slug).normalize("NFC");
+  } catch {
+    return slug.normalize("NFC");
+  }
+}
+
 export async function getPostBySlug(slug: string) {
+  const normalized = normalizeSlug(slug);
+
   return prisma.post.findUnique({
-    where: { slug },
+    where: { slug: normalized },
     include: {
       tags: {
         select: { name: true },
