@@ -3,13 +3,20 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { logoutAction } from "@/lib/actions/auth";
 
 const navItems = [
   { href: "/", label: "글" },
   { href: "/about", label: "소개" },
 ];
 
-export default function SiteHeader() {
+function linkClass(active: boolean) {
+  return active
+    ? "text-mint-soft"
+    : "text-white/80 transition-colors hover:text-white";
+}
+
+export default function SiteHeader({ isAdmin }: { isAdmin: boolean }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
@@ -34,16 +41,23 @@ export default function SiteHeader() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={
-                  active
-                    ? "text-mint-soft"
-                    : "text-white/80 transition-colors hover:text-white"
-                }
+                className={linkClass(active)}
               >
                 {item.label}
               </Link>
             );
           })}
+
+          {isAdmin && (
+            <form action={logoutAction}>
+              <button
+                type="submit"
+                className="text-white/80 transition-colors hover:text-white"
+              >
+                로그아웃
+              </button>
+            </form>
+          )}
         </nav>
 
         <button
@@ -73,6 +87,14 @@ export default function SiteHeader() {
               {item.label}
             </Link>
           ))}
+
+          {isAdmin && (
+            <form action={logoutAction}>
+              <button type="submit" className="block py-2 text-white/90">
+                로그아웃
+              </button>
+            </form>
+          )}
         </nav>
       )}
     </header>
