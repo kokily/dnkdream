@@ -51,9 +51,20 @@ export default function SiteHeader({ isAdmin }: { isAdmin: boolean }) {
           {isAdmin && (
             <Link
               href="/write"
-              className={linkClass(pathname.startsWith("/write"))}
+              className={linkClass(
+                pathname.startsWith("/write") && pathname !== "/write/drafts",
+              )}
             >
               글 작성
+            </Link>
+          )}
+
+          {isAdmin && (
+            <Link
+              href="/write/drafts"
+              className={linkClass(pathname === "/write/drafts")}
+            >
+              임시글
             </Link>
           )}
 
@@ -100,9 +111,20 @@ export default function SiteHeader({ isAdmin }: { isAdmin: boolean }) {
           {isAdmin && (
             <Link
               href="/write"
-              className={linkClass(pathname.startsWith("/write"))}
+              className="block py-2 text-white/90"
+              onClick={() => setOpen(false)}
             >
               글 작성
+            </Link>
+          )}
+
+          {isAdmin && (
+            <Link
+              href="/write/drafts"
+              className="block py-2 text-white/90"
+              onClick={() => setOpen(false)}
+            >
+              임시글
             </Link>
           )}
 

@@ -5,7 +5,7 @@ import { getPostBySlug } from "@/lib/posts";
 type Post = NonNullable<Awaited<ReturnType<typeof getPostBySlug>>>;
 
 export default async function PostArticle({ post }: { post: Post }) {
-  const html = await renderMarkdown(post.body);
+  const html = renderMarkdown(post.body);
 
   return (
     <article className="mx-auto max-w-3xl">

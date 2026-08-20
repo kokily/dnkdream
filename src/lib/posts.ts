@@ -2,6 +2,7 @@ import { prisma } from "./db";
 
 export async function listPosts() {
   return prisma.post.findMany({
+    where: { publishedAt: { not: null } },
     orderBy: { createdAt: "desc" },
     include: {
       tags: {
@@ -21,7 +22,7 @@ export async function listPosts() {
 
 export async function listPostsByCategory(category: string) {
   return prisma.post.findMany({
-    where: { category },
+    where: { category, publishedAt: { not: null } },
     orderBy: { createdAt: "desc" },
     include: {
       tags: {
@@ -43,6 +44,7 @@ export async function listPostsByTag(name: string) {
   return prisma.post.findMany({
     where: {
       tags: { some: { name } },
+      publishedAt: { not: null },
     },
     orderBy: { createdAt: "desc" },
     include: {
@@ -63,6 +65,7 @@ export async function listPostsByTag(name: string) {
 
 export async function listCategories() {
   const rows = await prisma.post.findMany({
+    where: { publishedAt: { not: null } },
     select: { category: true },
     distinct: ["category"],
     orderBy: { category: "asc" },
@@ -85,7 +88,34 @@ export async function getPostBySlug(slug: string) {
   const normalized = normalizeSlug(slug);
 
   return prisma.post.findUnique({
-    where: { slug: normalized },
+    where: { slug: normalized, publishedAt: { not: null } },
+    include: {
+      tags: {
+        select: { name: true },
+        orderBy: { name: "asc" },
+      },
+    },
+  });
+}
+
+// 임시저장: /write/drafts
+export async function listDrafts() {
+  return prisma.post.findMany({
+    where: { publishedAt: null },
+    orderBy: { updatedAt: "desc" },
+    include: {
+      tags: {
+        select: { name: true },
+        orderBy: { name: "asc" },
+      },
+    },
+  });
+}
+
+// 임시저장: 에디터에서 글 다시 불러오기
+export async function getPostById(id: string) {
+  return prisma.post.findUnique({
+    where: { id },
     include: {
       tags: {
         select: { name: true },
