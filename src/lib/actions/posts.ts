@@ -19,7 +19,7 @@ function fields(formData: FormData) {
     category: String(formData.get("category") ?? "").trim(),
     title: String(formData.get("title") ?? "").trim(),
     body: String(formData.get("body") ?? "").trim(),
-    tags: parseTags(String(formData.get("targs") ?? "")),
+    tags: parseTags(String(formData.get("tags") ?? "")),
     thumbnail: String(formData.get("thumbnail") ?? "").trim() || null,
   };
 }
@@ -67,6 +67,9 @@ export async function saveDraftAction(formData: FormData) {
   };
 
   if (id) {
+    // 임시 저장: 이전 퍼블리싱 상태 확인
+    const existing = await prisma.post.findUnique({ where: { id } });
+
     await prisma.post.update({
       where: { id },
       data: { ...data, tags: { set: [] } },
@@ -77,7 +80,14 @@ export async function saveDraftAction(formData: FormData) {
       data: { tags: await connectTags(tags) },
     });
 
-    return { id: post.id };
+    // 임시 저장: 퍼블리싱 -> Temp 홈/상세에서 바로 사라지게
+    if (existing?.publishedAt) {
+      revalidatePath("/");
+      revalidatePath(`/category/${encodeURIComponent(existing.category)}`);
+      revalidatePath(`/post/${encodeURIComponent(existing.slug)}`);
+    }
+
+    return { id: post.id, unpublished: !!existing?.publishedAt };
   }
 
   const post = await prisma.post.create({
@@ -88,7 +98,7 @@ export async function saveDraftAction(formData: FormData) {
     },
   });
 
-  return { id: post.id };
+  return { id: post.id, unpublished: false };
 }
 
 export async function createPostAction(

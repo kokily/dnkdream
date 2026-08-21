@@ -20,6 +20,7 @@ type Draft = {
   title: string;
   body: string;
   thumbnail: string | null;
+  publishedAt: Date | null;
   tags: { name: string }[];
 };
 
@@ -36,6 +37,7 @@ export default function WriteForm({ draft }: { draft?: Draft }) {
   const [draftId, setDraftId] = useState(draft?.id ?? ""); // 임시저장: 첫 저장 후 id 유지
   const [status, setStatus] = useState<string | null>(null);
   const [dragging, setDragging] = useState(false);
+  const [isPublished, setIsPublished] = useState(!!draft?.publishedAt);
   const formRef = useRef<HTMLFormElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const bodyRef = useRef(body);
@@ -113,13 +115,18 @@ export default function WriteForm({ draft }: { draft?: Draft }) {
 
     const result = await saveDraftAction(new FormData(form));
 
-    if ("error" in result && result.error) {
-      setStatus(result.error);
+    if (!result.id) {
+      setStatus(result.error ?? "임시 저장에 실패했습니다");
       return;
     }
 
     setDraftId(result.id);
-    setStatus("임시 저장했습니다");
+    setIsPublished(false);
+    setStatus(
+      result.unpublished
+        ? "임시글로 되돌렸습니다. 홈에서는 더 이상 보이지 않습니다."
+        : "임시 저장했습니다",
+    );
 
     if (!draft?.id) {
       router.replace(`/write/${result.id}`);
