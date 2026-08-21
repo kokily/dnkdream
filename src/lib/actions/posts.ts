@@ -155,3 +155,25 @@ export async function deleteDraftAction(formData: FormData) {
   }
   await prisma.post.delete({ where: { id } });
 }
+
+export async function deletePostAction(formData: FormData) {
+  const session = await auth();
+
+  if (!session?.user) {
+    return;
+  }
+
+  const id = String(formData.get("id") ?? "");
+  const post = await prisma.post.findUnique({ where: { id } });
+
+  if (!post) {
+    return;
+  }
+
+  await prisma.post.delete({ where: { id } });
+
+  revalidatePath("/");
+  revalidatePath(`/category/${encodeURIComponent(post.category)}`);
+  revalidatePath(`/post/${encodeURIComponent(post.slug)}`);
+  redirect("/");
+}

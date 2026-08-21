@@ -28,6 +28,18 @@ a {
   text-decoration: none;
 }
 
+button:not(:disabled),
+[type="button"]:not(:disabled),
+[type="submit"]:not(:disabled) {
+  cursor: pointer;
+}
+
+button:disabled,
+[type="button"]:disabled,
+[type="submit"]:disabled {
+  cursor: not-allowed;
+}
+
 .markdown {
   line-height: 1.75;
   color: var(--color-ink);

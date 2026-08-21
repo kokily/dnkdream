@@ -1,7 +1,10 @@
-import PostArticle from "@/components/post-article";
-import { getPostBySlug } from "@/lib/posts";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { auth } from "@/auth";
+import CommentSection from "@/components/comment-section";
+import PostArticle from "@/components/post-article";
+import { listComments } from "@/lib/comments";
+import { getPostBySlug } from "@/lib/posts";
 
 type PostPageProps = {
   params: Promise<{ slug: string }>;
@@ -31,5 +34,19 @@ export default async function PostPage({ params }: PostPageProps) {
     notFound();
   }
 
-  return <PostArticle post={post} />;
+  const [comments, session] = await Promise.all([
+    listComments(post.id),
+    auth(),
+  ]);
+
+  return (
+    <>
+      <PostArticle post={post} />
+      <CommentSection
+        postId={post.id}
+        comments={comments}
+        isAdmin={!!session?.user}
+      />
+    </>
+  );
 }
