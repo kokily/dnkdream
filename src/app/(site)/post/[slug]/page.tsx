@@ -20,9 +20,33 @@ export async function generateMetadata({
     return { title: "글을 찾을 수 없습니다" };
   }
 
+  const description = post.body.replace(/\s+/g, " ").trim().slice(0, 80);
+  const image = post.thumbnail
+    ? [{ url: post.thumbnail, alt: post.title }]
+    : [
+        {
+          url: "/logo512.png",
+          width: 512,
+          height: 512,
+          alt: "D&K Dreams Blog",
+        },
+      ];
+
   return {
     title: post.title,
-    description: post.body.slice(0, 80),
+    description,
+    openGraph: {
+      title: post.title,
+      description,
+      type: "article",
+      images: image,
+    },
+    twitter: {
+      card: post.thumbnail ? "summary_large_image" : "summary",
+      title: post.title,
+      description,
+      images: image.map((item) => item.url),
+    },
   };
 }
 
