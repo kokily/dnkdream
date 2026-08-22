@@ -1,5 +1,5 @@
-import CommentForm from "@/components/comment-form";
-import CommentList from "@/components/comment-list";
+import CommentForm from "@/components/comment/comment-form";
+import CommentList from "@/components/comment/comment-list";
 import type { CommentThread } from "@/lib/comments";
 
 export default function CommentSection({

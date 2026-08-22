@@ -1,5 +1,5 @@
-import NotFoundContent from "@/components/not-found-content";
-import SiteShell from "@/components/site-shell";
+import NotFoundContent from "@/components/site/not-found-content";
+import SiteShell from "@/components/layout/site-shell";
 
 export default async function RootNotFound() {
   return (

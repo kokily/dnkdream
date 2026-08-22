@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { auth } from "@/auth";
-import CommentSection from "@/components/comment-section";
-import PostArticle from "@/components/post-article";
+import CommentSection from "@/components/comment/comment-section";
+import PostArticle from "@/components/post/post-article";
 import { listComments } from "@/lib/comments";
 import { getPostBySlug } from "@/lib/posts";
 

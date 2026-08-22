@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import PostFeed from "@/components/post-feed";
+import PostFeed from "@/components/post/post-feed";
 import {
   listCategories,
   listPostsByCategory,

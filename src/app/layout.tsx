@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Rajdhani } from "next/font/google";
 import localFont from "next/font/local";
-import Analytics from "@/components/analytics";
+import Analytics from "@/components/site/analytics";
 import "./globals.css";
 
 const rajdhani = Rajdhani({

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import DraftList from "@/components/draft-list";
+import DraftList from "@/components/write/draft-list";
 import { listDrafts } from "@/lib/posts";
 
 export const metadata: Metadata = {

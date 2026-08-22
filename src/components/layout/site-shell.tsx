@@ -1,4 +1,4 @@
-import SiteHeader from "@/components/site-header";
+import SiteHeader from "@/components/layout/site-header";
 import { auth } from "@/auth";
 
 export default async function SiteShell({

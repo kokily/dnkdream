@@ -1,4 +1,4 @@
-import NotFoundContent from "@/components/not-found-content";
+import NotFoundContent from "@/components/site/not-found-content";
 
 export default function SiteNotFound() {
   return <NotFoundContent />;

@@ -1,4 +1,4 @@
-import PageHeading from "@/components/page-heading";
+import PageHeading from "@/components/site/page-heading";
 import Image from "next/image";
 
 export default function AboutContent() {

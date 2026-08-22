@@ -1,4 +1,4 @@
-import WriteForm from "@/components/write-form";
+import WriteForm from "@/components/write/write-form";
 import { getPostById } from "@/lib/posts";
 import { notFound } from "next/navigation";
 

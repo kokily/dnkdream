@@ -4,7 +4,7 @@ import { useState } from "react";
 import { deleteCommentAction } from "@/lib/actions/comments";
 import { formatDate } from "@/lib/format-date";
 import type { CommentThread } from "@/lib/comments";
-import CommentForm from "@/components/comment-form";
+import CommentForm from "@/components/comment/comment-form";
 
 type Item = CommentThread | CommentThread["replies"][number];
 

@@ -1,6 +1,6 @@
 import { PostListItem } from "@/lib/posts";
+import PageHeading from "@/components/site/page-heading";
 import CategoryPills from "./category-pills";
-import PageHeading from "./page-heading";
 import Pagination from "./pagination";
 import PostList from "./post-list";
 import PostSearch from "./post-search";

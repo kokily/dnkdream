@@ -1,4 +1,4 @@
-import WriteShell from "@/components/write-shell";
+import WriteShell from "@/components/layout/write-shell";
 import React from "react";
 
 export default function WriteLayout({

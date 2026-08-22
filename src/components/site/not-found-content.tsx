@@ -1,4 +1,4 @@
-import PageHeading from "@/components/page-heading";
+import PageHeading from "@/components/site/page-heading";
 import Link from "next/link";
 
 export default function NotFoundContent() {

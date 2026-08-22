@@ -2,8 +2,8 @@ import { auth } from "@/auth";
 import { formatDate } from "@/lib/format-date";
 import { renderMarkdownWithToc } from "@/lib/markdown-server";
 import { getPostBySlug } from "@/lib/posts";
-import PostAdminActions from "@/components/post-admin-actions";
-import PostToc from "@/components/post-toc";
+import PostAdminActions from "@/components/post/post-admin-actions";
+import PostToc from "@/components/post/post-toc";
 import Link from "next/link";
 import TagLink from "./tag-link";
 

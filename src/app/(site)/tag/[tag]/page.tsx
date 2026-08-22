@@ -1,4 +1,4 @@
-import PostFeed from "@/components/post-feed";
+import PostFeed from "@/components/post/post-feed";
 import {
   listPostsByTag,
   pageFromSearchParams,

@@ -1,4 +1,4 @@
-import LoginShell from "@/components/login-shell";
+import LoginShell from "@/components/layout/login-shell";
 
 export default function AuthLayout({
   children,

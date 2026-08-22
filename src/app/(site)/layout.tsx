@@ -1,4 +1,4 @@
-import SiteShell from "@/components/site-shell";
+import SiteShell from "@/components/layout/site-shell";
 
 export default function SiteLayout({
   children,
