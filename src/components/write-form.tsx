@@ -3,6 +3,7 @@
 import {
   useActionState,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -24,6 +25,15 @@ type Draft = {
   tags: { name: string }[];
 };
 
+const PAIRS: Record<string, string> = {
+  "(": ")",
+  "[": "]",
+  "{": "}",
+  "<": ">",
+  '"': '"',
+  "'": "'",
+};
+
 export default function WriteForm({ draft }: { draft?: Draft }) {
   const router = useRouter();
   const [error, formAction, pending] = useActionState(createPostAction, null);
@@ -34,7 +44,7 @@ export default function WriteForm({ draft }: { draft?: Draft }) {
   );
   const [body, setBody] = useState(draft?.body ?? "");
   const [thumbnail, setThumbnail] = useState(draft?.thumbnail ?? "");
-  const [draftId, setDraftId] = useState(draft?.id ?? ""); // 임시저장: 첫 저장 후 id 유지
+  const [draftId, setDraftId] = useState(draft?.id ?? "");
   const [status, setStatus] = useState<string | null>(null);
   const [dragging, setDragging] = useState(false);
   const [isPublished, setIsPublished] = useState(!!draft?.publishedAt);
@@ -42,26 +52,34 @@ export default function WriteForm({ draft }: { draft?: Draft }) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const bodyRef = useRef(body);
   const dragCount = useRef(0);
+  const selectionRef = useRef<{ start: number; end: number } | null>(null);
 
   bodyRef.current = body;
 
+  useLayoutEffect(() => {
+    const el = textareaRef.current;
+    const selection = selectionRef.current;
+    if (!el || !selection) return;
+    el.setSelectionRange(selection.start, selection.end);
+    selectionRef.current = null;
+  }, [body]);
+
   const preview = useMemo(() => renderMarkdown(body), [body]);
 
+  function replaceBody(next: string, start: number, end: number) {
+    bodyRef.current = next;
+    selectionRef.current = { start, end };
+    setBody(next);
+  }
+
   function insertAtCursor(snippet: string) {
-    const current = bodyRef.current;
     const el = textareaRef.current;
+    const current = el?.value ?? bodyRef.current;
     const start = el?.selectionStart ?? current.length;
     const end = el?.selectionEnd ?? start;
     const next = `${current.slice(0, start)}\n\n${snippet}\n${current.slice(end)}`;
-
-    setBody(next);
-
-    requestAnimationFrame(() => {
-      if (!el) return;
-      const pos = start + snippet.length + 3;
-      el.focus();
-      el.setSelectionRange(pos, pos);
-    });
+    const pos = start + snippet.length + 3;
+    replaceBody(next, pos, pos);
   }
 
   async function uploadFile(file: File, asThumbnail = false) {
@@ -103,7 +121,6 @@ export default function WriteForm({ draft }: { draft?: Draft }) {
     input.click();
   }
 
-  // 임시저장: 브라우저 저장 대신 DB에 임시글 저장
   async function saveDraft() {
     const form = formRef.current;
 
@@ -180,7 +197,6 @@ export default function WriteForm({ draft }: { draft?: Draft }) {
     };
   }, []);
 
-  // 임시저장: 제목 칸에 포커스가 있어도 Ctrl+S 동작
   useEffect(() => {
     const onKeyDown = (event: globalThis.KeyboardEvent) => {
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "s") {
@@ -207,7 +223,101 @@ export default function WriteForm({ draft }: { draft?: Draft }) {
     );
   }
 
+  function applyLineIndent(direction: "in" | "out") {
+    const el = textareaRef.current;
+    if (!el) return;
+
+    const current = el.value;
+    const start = el.selectionStart;
+    const end = el.selectionEnd;
+    const indent = "  ";
+    const lineStart = current.lastIndexOf("\n", start - 1) + 1;
+    const nextBreak = current.indexOf("\n", end);
+    const blockEnd = nextBreak === -1 ? current.length : nextBreak;
+    const lines = current.slice(lineStart, blockEnd).split("\n");
+
+    let startDelta = 0;
+    let endDelta = 0;
+
+    const nextLines = lines.map((line, index) => {
+      if (direction === "in") {
+        if (index === 0) startDelta = indent.length;
+        endDelta += indent.length;
+        return `${indent}${line}`;
+      }
+
+      if (line.startsWith(indent)) {
+        if (index === 0) startDelta = -indent.length;
+        endDelta -= indent.length;
+        return line.slice(indent.length);
+      }
+
+      if (line.startsWith("\t")) {
+        if (index === 0) startDelta = -1;
+        endDelta -= 1;
+        return line.slice(1);
+      }
+
+      return line;
+    });
+
+    replaceBody(
+      `${current.slice(0, lineStart)}${nextLines.join("\n")}${current.slice(blockEnd)}`,
+      Math.max(lineStart, start + startDelta),
+      Math.max(lineStart, end + endDelta),
+    );
+  }
+
   function onKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
+    const closer = PAIRS[event.key];
+    const modified = event.ctrlKey || event.metaKey || event.altKey;
+
+    if (closer && !modified) {
+      event.preventDefault();
+      const el = event.currentTarget;
+      const current = el.value;
+      const start = el.selectionStart;
+      const end = el.selectionEnd;
+      const selected = current.slice(start, end);
+      const next = `${current.slice(0, start)}${event.key}${selected}${closer}${current.slice(end)}`;
+      replaceBody(next, start + 1, start + 1 + selected.length);
+      return;
+    }
+
+    if (
+      !modified &&
+      Object.values(PAIRS).includes(event.key) &&
+      event.currentTarget.selectionStart === event.currentTarget.selectionEnd &&
+      event.currentTarget.value[event.currentTarget.selectionStart] ===
+        event.key
+    ) {
+      event.preventDefault();
+      const pos = event.currentTarget.selectionStart + 1;
+      event.currentTarget.setSelectionRange(pos, pos);
+      return;
+    }
+
+    if (event.key === "Tab") {
+      event.preventDefault();
+
+      const el = event.currentTarget;
+
+      if (!event.shiftKey && el.selectionStart === el.selectionEnd) {
+        const start = el.selectionStart;
+        const current = el.value;
+        const indent = "  ";
+        replaceBody(
+          `${current.slice(0, start)}${indent}${current.slice(start)}`,
+          start + indent.length,
+          start + indent.length,
+        );
+        return;
+      }
+
+      applyLineIndent(event.shiftKey ? "out" : "in");
+      return;
+    }
+
     if (
       (event.ctrlKey || event.metaKey) &&
       event.shiftKey &&
@@ -221,14 +331,16 @@ export default function WriteForm({ draft }: { draft?: Draft }) {
     if (event.key !== "Enter") return;
 
     const el = event.currentTarget;
-    const untilCursor = body.slice(0, el.selectionStart);
+    const current = el.value;
+    const untilCursor = current.slice(0, el.selectionStart);
     const line = untilCursor.split("\n").at(-1)?.trim() ?? "";
 
     if (line !== "/image" && line !== "/이미지") return;
 
     event.preventDefault();
     const lineStart = untilCursor.lastIndexOf("\n") + 1;
-    setBody(body.slice(0, lineStart) + body.slice(el.selectionEnd));
+    const next = current.slice(0, lineStart) + current.slice(el.selectionEnd);
+    replaceBody(next, lineStart, lineStart);
     pickFile();
   }
 
@@ -304,7 +416,10 @@ export default function WriteForm({ draft }: { draft?: Draft }) {
           ref={textareaRef}
           name="body"
           value={body}
-          onChange={(event) => setBody(event.target.value)}
+          onChange={(event) => {
+            bodyRef.current = event.target.value;
+            setBody(event.target.value);
+          }}
           onPaste={onPaste}
           onKeyDown={onKeyDown}
           placeholder="마크다운으로 작성하세요. Ctrl+S 임시저장. 이미지: 드래그, Ctrl+Shift+U, /image 후 Enter."

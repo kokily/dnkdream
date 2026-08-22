@@ -1,6 +1,6 @@
 import { auth } from "@/auth";
 import { formatDate } from "@/lib/format-date";
-import { renderMarkdownWithToc } from "@/lib/markdown";
+import { renderMarkdownWithToc } from "@/lib/markdown-server";
 import { getPostBySlug } from "@/lib/posts";
 import PostAdminActions from "@/components/post-admin-actions";
 import PostToc from "@/components/post-toc";
@@ -11,7 +11,7 @@ type Post = NonNullable<Awaited<ReturnType<typeof getPostBySlug>>>;
 
 export default async function PostArticle({ post }: { post: Post }) {
   const session = await auth();
-  const { html, toc } = renderMarkdownWithToc(post.body);
+  const { html, toc } = await renderMarkdownWithToc(post.body);
 
   return (
     <article className="relative mx-auto max-w-3xl">

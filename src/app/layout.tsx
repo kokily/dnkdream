@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Rajdhani } from "next/font/google";
 import localFont from "next/font/local";
+import Analytics from "@/components/analytics";
 import "./globals.css";
 
 const rajdhani = Rajdhani({
@@ -28,6 +29,17 @@ export const metadata: Metadata = {
     template: "%s | D&K Dreams Blog",
   },
   description: "개발과 일상을 기록하는 D&K Dreams 블로그",
+  alternates: {
+    types: {
+      "application/rss+xml": "/feed.xml",
+    },
+  },
+  verification: {
+    google: "8tl7dJru1oZk2hSD7Mhr0rpZ2QE68a15_C9Ny8JiBbQ",
+    other: {
+      "naver-site-verification": "8538c2d2cda20e8aedc196b49ba0f8ccc7b4dde0",
+    },
+  },
   openGraph: {
     type: "website",
     locale: "ko_KR",
@@ -56,6 +68,7 @@ export default function RootLayout({
       className={`${rajdhani.variable} ${rokafMedium.variable} ${rokafBold.variable}`}
     >
       <body className="min-h-dvh antialiased">{children}</body>
+      <Analytics />
     </html>
   );
 }

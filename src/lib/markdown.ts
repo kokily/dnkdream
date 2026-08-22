@@ -16,9 +16,37 @@ function escapeAttr(value: string) {
     .replaceAll("<", "&lt;");
 }
 
-export function renderMarkdownWithToc(source: string) {
+function escapeHtml(value: string) {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;");
+}
+
+export function sanitizeMarkdownHtml(html: string) {
+  return DOMPurify.sanitize(html, {
+    ADD_TAGS: ["iframe"],
+    ADD_ATTR: [
+      "allow",
+      "allowfullscreen",
+      "frameborder",
+      "loading",
+      "referrerpolicy",
+      "id",
+      "class",
+      "style",
+      "tabindex",
+    ],
+  });
+}
+
+export function createMarkdownParser(options?: {
+  highlight?: (text: string, lang: string) => string;
+}) {
   const toc: TocItem[] = [];
   const slugger = new GithubSlugger();
+  const highlight = options?.highlight;
+
   const marked = new Marked({
     gfm: true,
     breaks: true,
@@ -45,28 +73,21 @@ export function renderMarkdownWithToc(source: string) {
         const titleAttr = title ? ` title="${escapeAttr(title)}"` : "";
         return `<a href="${escapeAttr(href)}"${titleAttr}>${text}</a>`;
       },
+      code({ text, lang }) {
+        const highlighted = highlight?.(text, lang ?? "");
+        if (highlighted) return highlighted;
+
+        const language = lang ? ` class="language-${escapeAttr(lang)}"` : "";
+        return `<pre><code${language}>${escapeHtml(text)}</code></pre>\n`;
+      },
     },
   });
 
-  const html = marked.parse(source, { async: false }) as string;
-
-  return {
-    toc,
-    html: DOMPurify.sanitize(html, {
-      ADD_TAGS: ["iframe"],
-      ADD_ATTR: [
-        "allow",
-        "allowfullscreen",
-        "frameborder",
-        "loading",
-        "referrerpolicy",
-        "id",
-        "class",
-      ],
-    }),
-  };
+  return { marked, toc };
 }
 
 export function renderMarkdown(source: string) {
-  return renderMarkdownWithToc(source).html;
+  const { marked } = createMarkdownParser();
+  const html = marked.parse(source, { async: false }) as string;
+  return sanitizeMarkdownHtml(html);
 }

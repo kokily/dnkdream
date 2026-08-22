@@ -85,6 +85,7 @@ export async function saveDraftAction(formData: FormData) {
       revalidatePath("/");
       revalidatePath(`/category/${encodeURIComponent(existing.category)}`);
       revalidatePath(`/post/${encodeURIComponent(existing.slug)}`);
+      revalidatePath("/feed.xml");
     }
 
     return { id: post.id, unpublished: !!existing?.publishedAt };
@@ -139,6 +140,7 @@ export async function createPostAction(
   revalidatePath("/");
   revalidatePath(`/category/${encodeURIComponent(category)}`);
   revalidatePath(`/post/${encodeURIComponent(post.slug)}`);
+  revalidatePath("/feed.xml");
   redirect(`/post/${encodeURIComponent(post.slug)}`);
 }
 
@@ -176,5 +178,6 @@ export async function deletePostAction(formData: FormData) {
   revalidatePath("/");
   revalidatePath(`/category/${encodeURIComponent(post.category)}`);
   revalidatePath(`/post/${encodeURIComponent(post.slug)}`);
+  revalidatePath("/feed.xml");
   redirect("/");
 }
