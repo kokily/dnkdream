@@ -2,6 +2,7 @@ import { formatDate } from "@/lib/format-date";
 import { PostListItem } from "@/lib/posts";
 import Image from "next/image";
 import Link from "next/link";
+import TagLink from "./tag-link";
 
 function excerpt(body: string, max = 140) {
   const text = body
@@ -35,7 +36,14 @@ export default function PostCard({ post }: { post: PostListItem }) {
       </Link>
 
       <div className="min-w-0">
-        <p className="text-sm text-min">{post.category}</p>
+        <p className="text-sm text-mint">
+          <Link
+            href={`/category/${encodeURIComponent(post.category)}`}
+            className="hover:underline"
+          >
+            {post.category}
+          </Link>
+        </p>
         <h2 className="mt-1 text-xl font-semibold tracking-tight">
           <Link href={`/post/${post.slug}`} className="hover:text-mint">
             {post.title}
@@ -53,11 +61,8 @@ export default function PostCard({ post }: { post: PostListItem }) {
         {post.tags.length > 0 && (
           <ul className="mt-3 flex flex-wrap gap-2">
             {post.tags.map((tag) => (
-              <li
-                key={tag.name}
-                className="rounded-full bg-mint-soft/60 px-2.5 py-1 text-xs text-charcoal"
-              >
-                #{tag.name}
+              <li key={tag.name}>
+                <TagLink name={tag.name} />
               </li>
             ))}
           </ul>

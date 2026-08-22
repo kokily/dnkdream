@@ -3,6 +3,12 @@ import GithubSlugger from "github-slugger";
 import DOMPurify from "isomorphic-dompurify";
 import { extractYoutubeId, youtubeEmbed } from "@/lib/youtube";
 
+export type TocItem = {
+  id: string;
+  text: string;
+  depth: 2 | 3;
+};
+
 function escapeAttr(value: string) {
   return value
     .replaceAll("&", "&amp;")
@@ -10,7 +16,8 @@ function escapeAttr(value: string) {
     .replaceAll("<", "&lt;");
 }
 
-export function renderMarkdown(source: string) {
+export function renderMarkdownWithToc(source: string) {
+  const toc: TocItem[] = [];
   const slugger = new GithubSlugger();
   const marked = new Marked({
     gfm: true,
@@ -18,6 +25,11 @@ export function renderMarkdown(source: string) {
     renderer: {
       heading({ text, depth }) {
         const id = slugger.slug(text);
+
+        if (depth === 2 || depth === 3) {
+          toc.push({ id, text, depth });
+        }
+
         return `<h${depth} id="${id}">${text}</h${depth}>\n`;
       },
       image({ href, text }) {
@@ -38,16 +50,23 @@ export function renderMarkdown(source: string) {
 
   const html = marked.parse(source, { async: false }) as string;
 
-  return DOMPurify.sanitize(html, {
-    ADD_TAGS: ["iframe"],
-    ADD_ATTR: [
-      "allow",
-      "allowfullscreen",
-      "frameborder",
-      "loading",
-      "referrerpolicy",
-      "id",
-      "class",
-    ],
-  });
+  return {
+    toc,
+    html: DOMPurify.sanitize(html, {
+      ADD_TAGS: ["iframe"],
+      ADD_ATTR: [
+        "allow",
+        "allowfullscreen",
+        "frameborder",
+        "loading",
+        "referrerpolicy",
+        "id",
+        "class",
+      ],
+    }),
+  };
+}
+
+export function renderMarkdown(source: string) {
+  return renderMarkdownWithToc(source).html;
 }

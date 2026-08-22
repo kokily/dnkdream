@@ -41,9 +41,11 @@ export async function listPostsByCategory(category: string) {
 }
 
 export async function listPostsByTag(name: string) {
+  const normalized = normalizeSlug(name);
+
   return prisma.post.findMany({
     where: {
-      tags: { some: { name } },
+      tags: { some: { name: normalized } },
       publishedAt: { not: null },
     },
     orderBy: { createdAt: "desc" },

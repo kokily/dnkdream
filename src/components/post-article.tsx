@@ -3,6 +3,8 @@ import { formatDate } from "@/lib/format-date";
 import { renderMarkdown } from "@/lib/markdown";
 import { getPostBySlug } from "@/lib/posts";
 import PostAdminActions from "@/components/post-admin-actions";
+import Link from "next/link";
+import TagLink from "./tag-link";
 
 type Post = NonNullable<Awaited<ReturnType<typeof getPostBySlug>>>;
 
@@ -12,7 +14,14 @@ export default async function PostArticle({ post }: { post: Post }) {
 
   return (
     <article className="mx-auto max-w-3xl">
-      <p className="text-sm text-mint">{post.category}</p>
+      <p className="text-sm text-mint">
+        <Link
+          href={`/category/${encodeURIComponent(post.category)}`}
+          className="hover:underline"
+        >
+          {post.category}
+        </Link>
+      </p>
       <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
         {post.title}
       </h1>
@@ -23,11 +32,8 @@ export default async function PostArticle({ post }: { post: Post }) {
       {post.tags.length > 0 && (
         <ul className="mt-4 flex flex-wrap gap-2">
           {post.tags.map((tag) => (
-            <li
-              key={tag.name}
-              className="rounded-full bg-mint-soft/60 px-2.5 py-1 text-xs text-charcoal"
-            >
-              #{tag.name}
+            <li key={tag.name}>
+              <TagLink name={tag.name} />
             </li>
           ))}
         </ul>

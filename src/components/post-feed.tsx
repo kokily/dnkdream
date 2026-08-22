@@ -7,15 +7,17 @@ export default function PostFeed({
   title,
   posts,
   emptyText,
+  clearHref,
 }: {
   eyebrow?: string;
   title: string;
   posts: PostListItem[];
   emptyText: string;
+  clearHref?: string;
 }) {
   return (
     <section>
-      <PageHeading eyebrow={eyebrow} title={title} />
+      <PageHeading eyebrow={eyebrow} title={title} clearHref={clearHref} />
       <PostList posts={posts} emptyText={emptyText} />
     </section>
   );
