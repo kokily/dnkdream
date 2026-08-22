@@ -154,6 +154,7 @@ export async function deleteDraftAction(formData: FormData) {
     return;
   }
   await prisma.post.delete({ where: { id } });
+  revalidatePath("/write/drafts");
 }
 
 export async function deletePostAction(formData: FormData) {

@@ -76,6 +76,24 @@ export async function listCategories() {
   return rows.map((row) => row.category);
 }
 
+export async function listTags() {
+  const rows = await prisma.tag.findMany({
+    where: { posts: { some: { publishedAt: { not: null } } } },
+    select: { name: true },
+    orderBy: { name: "asc" },
+  });
+
+  return rows.map((row) => row.name);
+}
+
+export async function listPublishedForSitemap() {
+  return prisma.post.findMany({
+    where: { publishedAt: { not: null } },
+    select: { slug: true, updatedAt: true },
+    orderBy: { updatedAt: "desc" },
+  });
+}
+
 export type PostListItem = Awaited<ReturnType<typeof listPosts>>[number];
 
 function normalizeSlug(slug: string) {
