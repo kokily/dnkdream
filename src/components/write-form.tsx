@@ -64,7 +64,28 @@ export default function WriteForm({ draft }: { draft?: Draft }) {
     selectionRef.current = null;
   }, [body]);
 
-  const preview = useMemo(() => renderMarkdown(body), [body]);
+  const plainPreview = useMemo(() => renderMarkdown(body), [body]);
+  const [preview, setPreview] = useState(plainPreview);
+
+  useEffect(() => {
+    setPreview(plainPreview);
+
+    if (!body.includes("```")) return;
+
+    let cancelled = false;
+    const timer = window.setTimeout(() => {
+      void import("@/lib/markdown-highlight").then(({ renderMarkdownHtml }) =>
+        renderMarkdownHtml(body).then((html) => {
+          if (!cancelled) setPreview(html);
+        }),
+      );
+    }, 250);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [body, plainPreview]);
 
   function replaceBody(next: string, start: number, end: number) {
     bodyRef.current = next;
