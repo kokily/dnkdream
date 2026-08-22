@@ -1,68 +1,81 @@
 import { prisma } from "./db";
 
-export async function listPosts() {
-  return prisma.post.findMany({
-    where: { publishedAt: { not: null } },
-    orderBy: { createdAt: "desc" },
-    include: {
-      tags: {
-        select: { name: true },
-        orderBy: { name: "asc" },
-      },
-      _count: {
-        select: {
-          comments: {
-            where: { deleted: false, parentId: null },
-          },
-        },
+export const PAGE_SIZE = 10;
+
+const listInclude = {
+  tags: {
+    select: { name: true },
+    orderBy: { name: "asc" as const },
+  },
+  _count: {
+    select: {
+      comments: {
+        where: { deleted: false, parentId: null },
       },
     },
-  });
+  },
+};
+
+export function pageFromSearchParams(page: string | string[] | undefined) {
+  const raw = Array.isArray(page) ? page[0] : page;
+  const value = Number.parseInt(raw ?? "1", 10);
+  return Number.isFinite(value) && value > 0 ? value : 1;
 }
 
-export async function listPostsByCategory(category: string) {
-  return prisma.post.findMany({
-    where: { category, publishedAt: { not: null } },
+export function queryFromSearchParams(query: string | string[] | undefined) {
+  const raw = Array.isArray(query) ? query[0] : query;
+  return (raw ?? "").trim();
+}
+
+async function listPublished(
+  where: {
+    publishedAt: { not: null };
+    category?: string;
+    tags?: { some: { name: string } };
+  },
+  page: number,
+  query = "",
+) {
+  const filters = {
+    ...where,
+    ...(query
+      ? { title: { contains: query, mode: "insensitive" as const } }
+      : {}),
+  };
+  const total = await prisma.post.count({ where: filters });
+  const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const current = Math.min(Math.max(page, 1), pageCount);
+
+  const posts = await prisma.post.findMany({
+    where: filters,
     orderBy: { createdAt: "desc" },
-    include: {
-      tags: {
-        select: { name: true },
-        orderBy: { name: "asc" },
-      },
-      _count: {
-        select: {
-          comments: {
-            where: { deleted: false, parentId: null },
-          },
-        },
-      },
-    },
+    skip: (current - 1) * PAGE_SIZE,
+    take: PAGE_SIZE,
+    include: listInclude,
   });
+
+  return { posts, total, page: current, pageCount };
 }
 
-export async function listPostsByTag(name: string) {
+export async function listPosts(page = 1, query = "") {
+  return listPublished({ publishedAt: { not: null } }, page, query);
+}
+
+export async function listPostsByCategory(
+  category: string,
+  page = 1,
+  query = "",
+) {
+  return listPublished({ category, publishedAt: { not: null } }, page, query);
+}
+
+export async function listPostsByTag(name: string, page = 1, query = "") {
   const normalized = normalizeSlug(name);
-
-  return prisma.post.findMany({
-    where: {
-      tags: { some: { name: normalized } },
-      publishedAt: { not: null },
-    },
-    orderBy: { createdAt: "desc" },
-    include: {
-      tags: {
-        select: { name: true },
-        orderBy: { name: "asc" },
-      },
-      _count: {
-        select: {
-          comments: {
-            where: { deleted: false, parentId: null },
-          },
-        },
-      },
-    },
-  });
+  return listPublished(
+    { tags: { some: { name: normalized } }, publishedAt: { not: null } },
+    page,
+    query,
+  );
 }
 
 export async function listCategories() {
@@ -94,7 +107,9 @@ export async function listPublishedForSitemap() {
   });
 }
 
-export type PostListItem = Awaited<ReturnType<typeof listPosts>>[number];
+export type PostListItem = Awaited<
+  ReturnType<typeof listPosts>
+>["posts"][number];
 
 function normalizeSlug(slug: string) {
   try {
@@ -118,7 +133,6 @@ export async function getPostBySlug(slug: string) {
   });
 }
 
-// 임시저장: /write/drafts
 export async function listDrafts() {
   return prisma.post.findMany({
     where: { publishedAt: null },
@@ -132,7 +146,6 @@ export async function listDrafts() {
   });
 }
 
-// 임시저장: 에디터에서 글 다시 불러오기
 export async function getPostById(id: string) {
   return prisma.post.findUnique({
     where: { id },

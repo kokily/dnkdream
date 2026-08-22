@@ -1,23 +1,33 @@
 import PostFeed from "@/components/post-feed";
-import { listPostsByTag } from "@/lib/posts";
+import {
+  listPostsByTag,
+  pageFromSearchParams,
+  queryFromSearchParams,
+} from "@/lib/posts";
 import { notFound } from "next/navigation";
 
-type tagPageProps = {
+type TagPageProps = {
   params: Promise<{ tag: string }>;
+  searchParams: Promise<{ page?: string | string[]; q?: string | string[] }>;
 };
 
-export async function generateMetadata({ params }: tagPageProps) {
+export async function generateMetadata({ params }: TagPageProps) {
   const { tag } = await params;
-
   return { title: `#${decodeURIComponent(tag)}` };
 }
 
-export default async function TagPage({ params }: tagPageProps) {
+export default async function TagPage({ params, searchParams }: TagPageProps) {
   const { tag } = await params;
+  const { page: pageParam, q } = await searchParams;
   const name = decodeURIComponent(tag);
-  const posts = await listPostsByTag(name);
+  const query = queryFromSearchParams(q);
+  const result = await listPostsByTag(
+    name,
+    pageFromSearchParams(pageParam),
+    query,
+  );
 
-  if (posts.length === 0) {
+  if (result.total === 0 && !query) {
     notFound();
   }
 
@@ -25,9 +35,15 @@ export default async function TagPage({ params }: tagPageProps) {
     <PostFeed
       eyebrow="태그"
       title={`#${name}`}
-      posts={posts}
-      emptyText="이 태그에 글이 없습니다"
+      posts={result.posts}
+      emptyText={
+        query ? "제목에 맞는 글이 없습니다." : "이 태그에 글이 없습니다"
+      }
       clearHref="/"
+      page={result.page}
+      pageCount={result.pageCount}
+      basePath={`/tag/${encodeURIComponent(name)}`}
+      query={query}
     />
   );
 }
