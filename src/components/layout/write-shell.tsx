@@ -9,9 +9,11 @@ export default async function WriteShell({
   const session = await auth();
 
   return (
-    <div className="flex min-h-dvh flex-col">
+    <div className="flex h-dvh flex-col overflow-hidden">
       <SiteHeader isAdmin={!!session?.user} />
-      <main className="flex min-h-0 flex-1 flex-col">{children}</main>
+      <main className="flex min-h-0 flex-1 flex-col overflow-hidden">
+        {children}
+      </main>
     </div>
   );
 }

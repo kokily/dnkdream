@@ -1,4 +1,14 @@
-import type { ClipboardEvent, KeyboardEvent, RefObject } from "react";
+"use client";
+
+import {
+  useLayoutEffect,
+  useRef,
+  type ClipboardEvent,
+  type KeyboardEvent,
+  type RefObject,
+  type UIEvent,
+} from "react";
+import { caretOffsetTop } from "./caret";
 
 export default function WriteBodyPane({
   textareaRef,
@@ -17,9 +27,53 @@ export default function WriteBodyPane({
   onPaste: (event: ClipboardEvent<HTMLTextAreaElement>) => void;
   onKeyDown: (event: KeyboardEvent<HTMLTextAreaElement>) => void;
 }) {
+  const previewRef = useRef<HTMLDivElement>(null);
+  const syncing = useRef(false);
+
+  function syncFrom(source: HTMLElement, target: HTMLElement) {
+    if (syncing.current) return;
+
+    const sourceMax = source.scrollHeight - source.clientHeight;
+    const targetMax = target.scrollHeight - target.clientHeight;
+
+    if (sourceMax <= 0 || targetMax <= 0) return;
+
+    syncing.current = true;
+    target.scrollTop = (source.scrollTop / sourceMax) * targetMax;
+    requestAnimationFrame(() => {
+      syncing.current = false;
+    });
+  }
+
+  function followCaret() {
+    const editor = textareaRef.current;
+    const previewEl = previewRef.current;
+    if (!editor) return;
+
+    const caretTop = caretOffsetTop(editor);
+    const nextTop = caretTop - editor.clientHeight * 0.38;
+    editor.scrollTop = Math.max(0, nextTop);
+
+    if (previewEl) syncFrom(editor, previewEl);
+  }
+
+  useLayoutEffect(() => {
+    followCaret();
+  }, [body]);
+
+  function onEditorScroll(event: UIEvent<HTMLTextAreaElement>) {
+    const previewEl = previewRef.current;
+    if (previewEl) syncFrom(event.currentTarget, previewEl);
+  }
+
+  function onPreviewScroll(event: UIEvent<HTMLDivElement>) {
+    const editor = textareaRef.current;
+    if (editor) syncFrom(event.currentTarget, editor);
+  }
+
   return (
     <>
-      <div className="grid min-h-0 flex-1 md:grid-cols-2">
+      <div className="grid min-h-0 flex-1 grid-rows-2 overflow-hidden md:grid-cols-2 md:grid-rows-1">
         <textarea
           ref={textareaRef}
           name="body"
@@ -27,11 +81,14 @@ export default function WriteBodyPane({
           onChange={(event) => onChange(event.target.value)}
           onPaste={onPaste}
           onKeyDown={onKeyDown}
+          onScroll={onEditorScroll}
           placeholder="마크다운으로 작성하세요. Ctrl+S 임시저장. 이미지: 드래그, Ctrl+Shift+U, /image 후 Enter."
-          className="min-h-[60vh] resize-none border-r border-line bg-white p-4 font-mono outline-none"
+          className="h-full min-h-0 overflow-auto border-r border-line bg-white px-4 pt-4 pb-[45vh] font-mono outline-none"
         />
         <div
-          className="markdown min-h-[60vh] overflow-auto p-4"
+          ref={previewRef}
+          onScroll={onPreviewScroll}
+          className="markdown h-full min-h-0 overflow-auto px-4 pt-4 pb-[45vh]"
           dangerouslySetInnerHTML={{ __html: preview }}
         />
       </div>

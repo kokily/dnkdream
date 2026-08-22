@@ -76,7 +76,7 @@ export default function WriteForm({ draft }: { draft?: WriteDraft }) {
     <form
       ref={formRef}
       action={formAction}
-      className="relative flex min-h-0 flex-1 flex-col"
+      className="relative flex min-h-0 flex-1 flex-col overflow-hidden"
     >
       <input type="hidden" name="id" value={draftId} />
       <input type="hidden" name="thumbnail" value={thumbnail} />
