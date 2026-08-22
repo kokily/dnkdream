@@ -1,8 +1,9 @@
 import { auth } from "@/auth";
 import { formatDate } from "@/lib/format-date";
-import { renderMarkdown } from "@/lib/markdown";
+import { renderMarkdownWithToc } from "@/lib/markdown";
 import { getPostBySlug } from "@/lib/posts";
 import PostAdminActions from "@/components/post-admin-actions";
+import PostToc from "@/components/post-toc";
 import Link from "next/link";
 import TagLink from "./tag-link";
 
@@ -10,10 +11,10 @@ type Post = NonNullable<Awaited<ReturnType<typeof getPostBySlug>>>;
 
 export default async function PostArticle({ post }: { post: Post }) {
   const session = await auth();
-  const html = renderMarkdown(post.body);
+  const { html, toc } = renderMarkdownWithToc(post.body);
 
   return (
-    <article className="mx-auto max-w-3xl">
+    <article className="relative mx-auto max-w-3xl">
       <p className="text-sm text-mint">
         <Link
           href={`/category/${encodeURIComponent(post.category)}`}
@@ -41,10 +42,24 @@ export default async function PostArticle({ post }: { post: Post }) {
 
       {session?.user ? <PostAdminActions postId={post.id} /> : null}
 
-      <div
-        className="markdown mt-10"
-        dangerouslySetInnerHTML={{ __html: html }}
-      />
+      <div className="xl:hidden">
+        <PostToc items={toc} />
+      </div>
+
+      <div className="relative">
+        <div
+          className="markdown mt-10"
+          dangerouslySetInnerHTML={{ __html: html }}
+        />
+
+        {toc.length > 0 ? (
+          <div className="absolute top-0 left-full hidden h-full pl-8 xl:block">
+            <div className="sticky top-20 w-52">
+              <PostToc items={toc} aside />
+            </div>
+          </div>
+        ) : null}
+      </div>
     </article>
   );
 }

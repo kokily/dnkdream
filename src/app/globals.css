@@ -52,6 +52,7 @@ button:disabled,
   letter-spacing: -0.02em;
   margin-top: 2.25rem;
   margin-bottom: 0.75rem;
+  scroll-margin-top: 5rem;
 }
 
 .markdown h2 {
@@ -115,6 +116,14 @@ button:disabled,
 .markdown ol {
   margin: 0.85rem 0;
   padding-left: 1.25rem;
+}
+
+.markdown ul {
+  list-style: disc;
+}
+
+.markdown ol {
+  list-style: decimal;
 }
 
 .markdown li {
