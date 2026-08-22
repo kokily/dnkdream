@@ -5,6 +5,7 @@ import { slugifyTitle } from "../slug";
 import { prisma } from "../db";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { deleteImages, imageKeysFromPost } from "../storage";
 
 function parseTags(value: string) {
   return value
@@ -155,6 +156,7 @@ export async function deleteDraftAction(formData: FormData) {
   if (!post || post.publishedAt) {
     return;
   }
+  await deleteImages(imageKeysFromPost(post.thumbnail, post.body));
   await prisma.post.delete({ where: { id } });
   revalidatePath("/write/drafts");
 }
@@ -172,7 +174,7 @@ export async function deletePostAction(formData: FormData) {
   if (!post) {
     return;
   }
-
+  await deleteImages(imageKeysFromPost(post.thumbnail, post.body));
   await prisma.post.delete({ where: { id } });
 
   revalidatePath("/");
