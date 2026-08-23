@@ -78,6 +78,16 @@ export async function listPostsByTag(name: string, page = 1, query = "") {
   );
 }
 
+export async function listAllCategories() {
+  const rows = await prisma.post.findMany({
+    select: { category: true },
+    distinct: ["category"],
+    orderBy: { category: "asc" },
+  });
+
+  return rows.map((row) => row.category).filter(Boolean);
+}
+
 export async function listCategories() {
   const rows = await prisma.post.findMany({
     where: { publishedAt: { not: null } },

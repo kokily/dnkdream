@@ -4,6 +4,7 @@ import { renderMarkdownWithToc } from "@/lib/markdown-server";
 import { getPostBySlug } from "@/lib/posts";
 import PostAdminActions from "@/components/post/post-admin-actions";
 import PostToc from "@/components/post/post-toc";
+import Image from "next/image";
 import Link from "next/link";
 import TagLink from "./tag-link";
 
@@ -41,6 +42,19 @@ export default async function PostArticle({ post }: { post: Post }) {
       )}
 
       {session?.user ? <PostAdminActions postId={post.id} /> : null}
+
+      {post.thumbnail ? (
+        <div className="relative mt-8 aspect-video overflow-hidden rounded-xl">
+          <Image
+            src={post.thumbnail}
+            alt={post.title}
+            fill
+            priority
+            sizes="(min-width: 768px) 48rem, 100vw"
+            className="object-cover"
+          />
+        </div>
+      ) : null}
 
       <div className="xl:hidden">
         <PostToc items={toc} />

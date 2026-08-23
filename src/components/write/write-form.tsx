@@ -10,25 +10,26 @@ import { useWritePreview } from "./editor/use-preview";
 import WriteToolbar from "./editor/toolbar";
 import type { WriteDraft } from "./editor/types";
 
-export default function WriteForm({ draft }: { draft?: WriteDraft }) {
+export default function WriteForm({
+  draft,
+  categories,
+}: {
+  draft?: WriteDraft;
+  categories: string[];
+}) {
   const router = useRouter();
   const [error, formAction, pending] = useActionState(createPostAction, null);
   const [category, setCategory] = useState(draft?.category ?? "");
   const [title, setTitle] = useState(draft?.title ?? "");
-  const [tags, setTags] = useState(
-    draft?.tags.map((tag) => tag.name).join(", ") ?? "",
-  );
+  const [tags, setTags] = useState(draft?.tags.map((tag) => tag.name) ?? []);
   const [draftId, setDraftId] = useState(draft?.id ?? "");
   const [status, setStatus] = useState<string | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
   const { body, textareaRef, insertAtCursor, onChange, onKeyDown } =
     useWriteBody(draft?.body ?? "");
-  const { thumbnail, dragging, pickFile, onPaste } = useWriteImages(
-    draft?.thumbnail ?? "",
-    insertAtCursor,
-    setStatus,
-  );
+  const { thumbnail, dragging, pickFile, clearThumbnail, onPaste } =
+    useWriteImages(draft?.thumbnail ?? "", insertAtCursor, setStatus);
   const preview = useWritePreview(body);
 
   async function saveDraft() {
@@ -82,6 +83,7 @@ export default function WriteForm({ draft }: { draft?: WriteDraft }) {
       <input type="hidden" name="thumbnail" value={thumbnail} />
 
       <WriteToolbar
+        categories={categories}
         category={category}
         title={title}
         tags={tags}
@@ -105,10 +107,12 @@ export default function WriteForm({ draft }: { draft?: WriteDraft }) {
         textareaRef={textareaRef}
         body={body}
         preview={preview}
+        thumbnail={thumbnail}
         dragging={dragging}
         onChange={onChange}
         onPaste={onPaste}
         onKeyDown={(event) => onKeyDown(event, pickFile)}
+        onClearThumbnail={clearThumbnail}
       />
     </form>
   );

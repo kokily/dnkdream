@@ -1,4 +1,8 @@
+import CategoryField from "./category-field";
+import TagField from "./tag-field";
+
 export default function WriteToolbar({
+  categories,
   category,
   title,
   tags,
@@ -11,26 +15,25 @@ export default function WriteToolbar({
   onImage,
   onDraft,
 }: {
+  categories: string[];
   category: string;
   title: string;
-  tags: string;
+  tags: string[];
   thumbnail: string;
   pending: boolean;
   onCategory: (value: string) => void;
   onTitle: (value: string) => void;
-  onTags: (value: string) => void;
+  onTags: (tags: string[]) => void;
   onThumbnail: () => void;
   onImage: () => void;
   onDraft: () => void;
 }) {
   return (
     <div className="flex flex-wrap items-center gap-3 border-b border-line px-4 py-3">
-      <input
-        name="category"
+      <CategoryField
+        categories={categories}
         value={category}
-        onChange={(event) => onCategory(event.target.value)}
-        placeholder="카테고리"
-        className="w-36 rounded-md border border-line px-3 py-2 text-sm outline-none focus:border-mint"
+        onChange={onCategory}
       />
       <input
         name="title"
@@ -39,13 +42,7 @@ export default function WriteToolbar({
         placeholder="제목"
         className="min-w-60 flex-1 rounded-md border border-line px-3 py-2 text-sm outline-none focus:border-mint"
       />
-      <input
-        name="tags"
-        value={tags}
-        onChange={(event) => onTags(event.target.value)}
-        placeholder="태그, 쉼표로 구분"
-        className="min-w-48 flex-1 rounded-md border border-line px-3 py-2 text-sm outline-none focus:border-mint"
-      />
+      <TagField tags={tags} onChange={onTags} />
       <button
         type="button"
         onClick={onThumbnail}
