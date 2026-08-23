@@ -111,5 +111,9 @@ export function useWriteImages(
     );
   }
 
-  return { thumbnail, dragging, pickFile, onPaste };
+  function clearThumbnail() {
+    setThumbnail("");
+  }
+
+  return { thumbnail, dragging, pickFile, clearThumbnail, onPaste };
 }
