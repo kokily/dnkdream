@@ -13,6 +13,7 @@ type Post = NonNullable<Awaited<ReturnType<typeof getPostBySlug>>>;
 export default async function PostArticle({ post }: { post: Post }) {
   const session = await auth();
   const { html, toc } = await renderMarkdownWithToc(post.body);
+  const isAdmin = !!session?.user;
 
   return (
     <article className="relative mx-auto max-w-3xl">
@@ -29,6 +30,7 @@ export default async function PostArticle({ post }: { post: Post }) {
       </h1>
       <p className="mt-3 text-sm text-neutral-500">
         {formatDate(post.createdAt)}
+        {isAdmin ? ` · 조회 ${post.viewCount.toLocaleString("ko-KR")}` : null}
       </p>
 
       {post.tags.length > 0 && (
@@ -41,7 +43,7 @@ export default async function PostArticle({ post }: { post: Post }) {
         </ul>
       )}
 
-      {session?.user ? <PostAdminActions postId={post.id} /> : null}
+      {isAdmin ? <PostAdminActions postId={post.id} /> : null}
 
       {post.thumbnail ? (
         <div className="relative mt-8 aspect-video overflow-hidden rounded-xl">

@@ -4,7 +4,7 @@ import { auth } from "@/auth";
 import CommentSection from "@/components/comment/comment-section";
 import PostArticle from "@/components/post/post-article";
 import { listComments } from "@/lib/comments";
-import { getPostBySlug } from "@/lib/posts";
+import { getPostBySlug, recordPostView } from "@/lib/posts";
 
 type PostPageProps = {
   params: Promise<{ slug: string }>;
@@ -62,6 +62,10 @@ export default async function PostPage({ params }: PostPageProps) {
     listComments(post.id),
     auth(),
   ]);
+
+  if (!session?.user) {
+    await recordPostView(post.id);
+  }
 
   return (
     <>

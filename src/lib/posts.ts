@@ -1,6 +1,10 @@
+import { createHash } from "node:crypto";
+import { cookies, headers } from "next/headers";
 import { prisma } from "./db";
 
 export const PAGE_SIZE = 10;
+
+const VISITOR_COOKIE = "dnk_vid";
 
 const listInclude = {
   tags: {
@@ -141,6 +145,46 @@ export async function getPostBySlug(slug: string) {
       },
     },
   });
+}
+
+function hashVisitor(value: string) {
+  return createHash("sha256").update(value).digest("hex").slice(0, 32);
+}
+
+export async function getVisitorKey() {
+  const jar = await cookies();
+  const fromCookie = jar.get(VISITOR_COOKIE)?.value;
+
+  if (fromCookie && fromCookie.length >= 8) {
+    return `c:${fromCookie}`;
+  }
+
+  const headerStore = await headers();
+  const forwarded = headerStore.get("x-forwarded-for");
+  const ip =
+    forwarded?.split(",")[0]?.trim() ||
+    headerStore.get("x-real-ip") ||
+    "unknown";
+
+  return `ip:${hashVisitor(ip)}`;
+}
+
+export async function recordPostView(postId: string) {
+  const visitorKey = await getVisitorKey();
+
+  try {
+    await prisma.$transaction([
+      prisma.postView.create({
+        data: { postId, visitorKey },
+      }),
+      prisma.post.update({
+        where: { id: postId },
+        data: { viewCount: { increment: 1 } },
+      }),
+    ]);
+  } catch {
+    // 이미 본 방문이면 unique 위반 → 무시
+  }
 }
 
 export async function listDrafts() {

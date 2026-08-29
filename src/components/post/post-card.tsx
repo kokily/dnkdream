@@ -13,7 +13,13 @@ function excerpt(body: string, max = 140) {
   return text.length > max ? `${text.slice(0, max)}…` : text;
 }
 
-export default function PostCard({ post }: { post: PostListItem }) {
+export default function PostCard({
+  post,
+  isAdmin = false,
+}: {
+  post: PostListItem;
+  isAdmin?: boolean;
+}) {
   return (
     <article className="group grid gap-4 border-b border-line py-8 sm:grid-cols-[16rem_minmax(0,1fr)] sm:gap-6">
       <Link
@@ -70,6 +76,7 @@ export default function PostCard({ post }: { post: PostListItem }) {
 
         <p className="mt-3 text-sm text-neutral-500">
           {formatDate(post.createdAt)}
+          {isAdmin ? ` · 조회 ${post.viewCount.toLocaleString("ko-KR")}` : null}
         </p>
       </div>
     </article>
