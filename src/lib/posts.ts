@@ -1,10 +1,8 @@
 import { createHash } from "node:crypto";
-import { cookies, headers } from "next/headers";
+import { headers } from "next/headers";
 import { prisma } from "./db";
 
 export const PAGE_SIZE = 10;
-
-const VISITOR_COOKIE = "dnk_vid";
 
 const listInclude = {
   tags: {
@@ -152,21 +150,15 @@ function hashVisitor(value: string) {
 }
 
 export async function getVisitorKey() {
-  const jar = await cookies();
-  const fromCookie = jar.get(VISITOR_COOKIE)?.value;
-
-  if (fromCookie && fromCookie.length >= 8) {
-    return `c:${fromCookie}`;
-  }
-
   const headerStore = await headers();
   const forwarded = headerStore.get("x-forwarded-for");
   const ip =
     forwarded?.split(",")[0]?.trim() ||
     headerStore.get("x-real-ip") ||
     "unknown";
+  const ua = headerStore.get("user-agent") ?? "";
 
-  return `ip:${hashVisitor(ip)}`;
+  return `v:${hashVisitor(`${ip}|${ua}`)}`;
 }
 
 export async function recordPostView(postId: string) {
