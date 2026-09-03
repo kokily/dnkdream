@@ -1,11 +1,15 @@
 import Link from "next/link";
 import { deleteDraftAction } from "@/lib/actions/posts";
-import { formatDate } from "@/lib/format-date";
-import type { listDrafts } from "@/lib/posts";
+import { formatDate } from "@/lib/shared/format-date";
+import type { listDrafts } from "@/lib/queries/posts";
 
 type Draft = Awaited<ReturnType<typeof listDrafts>>[number];
 
-export default function DraftList({ drafts }: { drafts: Draft[] }) {
+interface DraftListProps {
+  drafts: Draft[];
+}
+
+export default function DraftList({ drafts }: DraftListProps) {
   if (drafts.length === 0) {
     return <p className="p-6 text-neutral-500">임시 저장된 글이 없습니다.</p>;
   }

@@ -1,8 +1,8 @@
-export default function LoginShell({
-  children,
-}: {
+interface LoginShellProps {
   children: React.ReactNode;
-}) {
+}
+
+export default function LoginShell({ children }: LoginShellProps) {
   return (
     <main className="flex min-h-dvh items-center justify-center px-4">
       <section className="w-full max-w-sm">

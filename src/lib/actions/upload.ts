@@ -1,7 +1,7 @@
 "use server";
 
 import { auth } from "@/auth";
-import { saveImage } from "../storage";
+import { saveImage } from "@/lib/server/storage";
 
 export async function uploadImageAction(formData: FormData) {
   const session = await auth();

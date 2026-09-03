@@ -1,9 +1,9 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
-import { prisma } from "../db";
-import { auth } from "@/auth";
 import bcrypt from "bcryptjs";
+import { revalidatePath } from "next/cache";
+import { prisma } from "@/lib/server/db";
+import { auth } from "@/auth";
 
 function text(formData: FormData, key: string) {
   return String(formData.get(key) ?? "").trim();

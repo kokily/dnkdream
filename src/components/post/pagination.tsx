@@ -1,11 +1,11 @@
+import { hrefForPage } from "@/lib/shared/href-for-page";
 import Link from "next/link";
 
-function hrefForPage(basePath: string, page: number, query: string) {
-  const params = new URLSearchParams();
-  if (query) params.set("q", query);
-  if (page > 1) params.set("page", String(page));
-  const qs = params.toString();
-  return qs ? `${basePath}?${qs}` : basePath;
+interface PaginationProps {
+  page: number;
+  pageCount: number;
+  basePath: string;
+  query: string;
 }
 
 export default function Pagination({
@@ -13,12 +13,7 @@ export default function Pagination({
   pageCount,
   basePath,
   query,
-}: {
-  page: number;
-  pageCount: number;
-  basePath: string;
-  query: string;
-}) {
+}: PaginationProps) {
   if (pageCount <= 1) return null;
 
   const pages = Array.from({ length: pageCount }, (_, index) => index + 1);

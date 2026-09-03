@@ -1,6 +1,9 @@
 import { lexer, type Token } from "marked";
 import { createHighlighter, type Highlighter } from "shiki";
-import { createMarkdownParser, sanitizeMarkdownHtml } from "@/lib/markdown";
+import {
+  createMarkdownParser,
+  sanitizeMarkdownHtml,
+} from "@/lib/shared/markdown";
 
 let highlighterPromise: Promise<Highlighter> | undefined;
 

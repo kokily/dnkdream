@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { renderMarkdown } from "@/lib/markdown";
+import { renderMarkdown } from "@/lib/shared/markdown";
 
 export function useWritePreview(body: string) {
   const plainPreview = useMemo(() => renderMarkdown(body), [body]);
@@ -14,7 +14,7 @@ export function useWritePreview(body: string) {
 
     let cancelled = false;
     const timer = window.setTimeout(() => {
-      void import("@/lib/markdown-highlight").then(({ renderMarkdownHtml }) =>
+      void import("@/lib/shared/markdown-highlight").then(({ renderMarkdownHtml }) =>
         renderMarkdownHtml(body).then((html) => {
           if (!cancelled) setPreview(html);
         }),

@@ -1,15 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useCategoryPills } from "./hooks/use-category-pills";
 
-export default function CategoryPills({
-  categories,
-}: {
+interface CategoryPillsProps {
   categories: string[];
-}) {
-  const pathname = usePathname();
-  const items = [...categories].sort((a, b) => a.localeCompare(b, "ko"));
+}
+
+export default function CategoryPills({ categories }: CategoryPillsProps) {
+  const { items, pathname } = useCategoryPills({ categories });
 
   if (items.length === 0) return null;
 

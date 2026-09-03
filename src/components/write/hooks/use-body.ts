@@ -9,7 +9,7 @@ import {
   PAIRS,
   shouldSkipCloser,
   wrapPair,
-} from "./keys";
+} from "../utils/keys";
 
 export function useWriteBody(initial: string) {
   const [body, setBody] = useState(initial);

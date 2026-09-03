@@ -1,5 +1,5 @@
-import PageHeading from "@/components/site/page-heading";
 import Image from "next/image";
+import PageHeading from "@/components/site/page-heading";
 
 export default function AboutContent() {
   return (

@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { auth } from "@/auth";
-import CommentSection from "@/components/comment/comment-section";
+import { listComments } from "@/lib/queries/comments";
+import { getPostBySlug, recordPostView } from "@/lib/queries/posts";
 import PostArticle from "@/components/post/post-article";
-import { listComments } from "@/lib/comments";
-import { getPostBySlug, recordPostView } from "@/lib/posts";
+import CommentSection from "@/components/comment/comment-section";
 
-type PostPageProps = {
+interface PostPageProps {
   params: Promise<{ slug: string }>;
-};
+}
 
 export async function generateMetadata({
   params,

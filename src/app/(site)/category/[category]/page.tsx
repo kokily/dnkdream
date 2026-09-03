@@ -1,17 +1,17 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import PostFeed from "@/components/post/post-feed";
 import {
   listCategories,
   listPostsByCategory,
   pageFromSearchParams,
   queryFromSearchParams,
-} from "@/lib/posts";
+} from "@/lib/queries/posts";
+import PostFeed from "@/components/post/post-feed";
 
-type CategoryPageProps = {
+interface CategoryPageProps {
   params: Promise<{ category: string }>;
   searchParams: Promise<{ page?: string | string[]; q?: string | string[] }>;
-};
+}
 
 export async function generateMetadata({
   params,
@@ -26,8 +26,10 @@ export default async function CategoryPage({
 }: CategoryPageProps) {
   const { category } = await params;
   const { page: pageParam, q } = await searchParams;
+
   const name = decodeURIComponent(category);
   const query = queryFromSearchParams(q);
+
   const [result, categories] = await Promise.all([
     listPostsByCategory(name, pageFromSearchParams(pageParam), query),
     listCategories(),

@@ -1,4 +1,6 @@
-import { prisma } from "./db";
+import "server-only";
+
+import { prisma } from "@/lib/server/db";
 
 const commentSelect = {
   id: true,

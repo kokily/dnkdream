@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
+import { listDrafts } from "@/lib/queries/posts";
 import DraftList from "@/components/write/draft-list";
-import { listDrafts } from "@/lib/posts";
 
 export const metadata: Metadata = {
   title: "임시글",

@@ -3,15 +3,17 @@
 import { useActionState } from "react";
 import { createCommentAction } from "@/lib/actions/comments";
 
+interface CommentFormProps {
+  postId: string;
+  parentId?: string;
+  isAdmin: boolean;
+}
+
 export default function CommentForm({
   postId,
   parentId,
   isAdmin,
-}: {
-  postId: string;
-  parentId?: string;
-  isAdmin: boolean;
-}) {
+}: CommentFormProps) {
   const [error, formAction, pending] = useActionState(
     createCommentAction,
     null,

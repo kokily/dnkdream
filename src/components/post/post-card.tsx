@@ -1,25 +1,16 @@
-import { formatDate } from "@/lib/format-date";
-import { PostListItem } from "@/lib/posts";
 import Image from "next/image";
 import Link from "next/link";
+import { formatDate } from "@/lib/shared/format-date";
+import { PostListItem } from "@/lib/queries/posts";
+import { excerpt } from "@/lib/shared/excerpt";
 import TagLink from "./tag-link";
 
-function excerpt(body: string, max = 140) {
-  const text = body
-    .replace(/[#*_`>~\[\]()]/g, "")
-    .replace(/\s+/g, " ")
-    .trim();
-
-  return text.length > max ? `${text.slice(0, max)}…` : text;
-}
-
-export default function PostCard({
-  post,
-  isAdmin = false,
-}: {
+interface PostCardProps {
   post: PostListItem;
   isAdmin?: boolean;
-}) {
+}
+
+export default function PostCard({ post, isAdmin = false }: PostCardProps) {
   return (
     <article className="group grid gap-4 border-b border-line py-8 sm:grid-cols-[16rem_minmax(0,1fr)] sm:gap-6">
       <Link

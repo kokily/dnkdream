@@ -1,10 +1,23 @@
 import { auth } from "@/auth";
-import { PostListItem } from "@/lib/posts";
+import { PostListItem } from "@/lib/queries/posts";
 import PageHeading from "@/components/site/page-heading";
 import CategoryPills from "./category-pills";
-import Pagination from "./pagination";
-import PostList from "./post-list";
 import PostSearch from "./post-search";
+import PostList from "./post-list";
+import Pagination from "./pagination";
+
+interface PostFeedProps {
+  eyebrow?: string;
+  title: string;
+  posts: PostListItem[];
+  emptyText: string;
+  clearHref?: string;
+  categories?: string[];
+  page: number;
+  pageCount: number;
+  basePath: string;
+  query: string;
+}
 
 export default async function PostFeed({
   eyebrow,
@@ -17,18 +30,7 @@ export default async function PostFeed({
   pageCount,
   basePath,
   query,
-}: {
-  eyebrow?: string;
-  title: string;
-  posts: PostListItem[];
-  emptyText: string;
-  clearHref?: string;
-  categories?: string[];
-  page: number;
-  pageCount: number;
-  basePath: string;
-  query: string;
-}) {
+}: PostFeedProps) {
   const session = await auth();
   const isAdmin = !!session?.user;
 

@@ -1,15 +1,17 @@
-import { PostListItem } from "@/lib/posts";
+import { PostListItem } from "@/lib/queries/posts";
 import PostCard from "./post-card";
+
+interface PostListProps {
+  posts: PostListItem[];
+  emptyText: string;
+  isAdmin?: boolean;
+}
 
 export default function PostList({
   posts,
   emptyText,
   isAdmin = false,
-}: {
-  posts: PostListItem[];
-  emptyText: string;
-  isAdmin?: boolean;
-}) {
+}: PostListProps) {
   if (posts.length === 0) {
     return <p className="mt-12 text-neutral-500">{emptyText}</p>;
   }

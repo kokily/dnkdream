@@ -3,7 +3,11 @@
 import Link from "next/link";
 import { deletePostAction } from "@/lib/actions/posts";
 
-export default function PostAdminActions({ postId }: { postId: string }) {
+interface PostAdminActionsProps {
+  postId: string;
+}
+
+export default function PostAdminActions({ postId }: PostAdminActionsProps) {
   return (
     <div className="mt-4 flex gap-2">
       <Link

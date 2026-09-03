@@ -16,7 +16,11 @@ function linkClass(active: boolean) {
     : "text-white/80 transition-colors hover:text-white";
 }
 
-export default function SiteHeader({ isAdmin }: { isAdmin: boolean }) {
+interface SiteHeaderProps {
+  isAdmin: boolean;
+}
+
+export default function SiteHeader({ isAdmin }: SiteHeaderProps) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 

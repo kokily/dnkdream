@@ -1,10 +1,9 @@
-export default function PostSearch({
-  basePath,
-  query,
-}: {
+interface PostSearchProps {
   basePath: string;
   query: string;
-}) {
+}
+
+export default function PostSearch({ basePath, query }: PostSearchProps) {
   return (
     <form action={basePath} method="get" className="flex gap-2">
       <input

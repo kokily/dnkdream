@@ -1,16 +1,18 @@
 import Link from "next/link";
 
+interface PageHeadingProps {
+  eyebrow?: string;
+  title: string;
+  description?: string;
+  clearHref?: string;
+}
+
 export default function PageHeading({
   eyebrow,
   title,
   description,
   clearHref,
-}: {
-  eyebrow?: string;
-  title: string;
-  description?: string;
-  clearHref?: string;
-}) {
+}: PageHeadingProps) {
   return (
     <header className="space-y-3">
       {eyebrow ? (

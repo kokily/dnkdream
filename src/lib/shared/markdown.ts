@@ -1,7 +1,7 @@
 import { Marked } from "marked";
 import GithubSlugger from "github-slugger";
 import DOMPurify from "isomorphic-dompurify";
-import { extractYoutubeId, youtubeEmbed } from "@/lib/youtube";
+import { extractYoutubeId, youtubeEmbed } from "@/lib/shared/youtube";
 
 export type TocItem = {
   id: string;

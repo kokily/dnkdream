@@ -6,13 +6,12 @@ function normalize(value: string) {
   return value.trim();
 }
 
-export default function TagField({
-  tags,
-  onChange,
-}: {
+interface TagFieldProps {
   tags: string[];
   onChange: (tags: string[]) => void;
-}) {
+}
+
+export default function TagField({ tags, onChange }: TagFieldProps) {
   const [draft, setDraft] = useState("");
   const composing = useRef(false);
 

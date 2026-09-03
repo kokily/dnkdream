@@ -1,15 +1,15 @@
-import PostFeed from "@/components/post/post-feed";
+import { notFound } from "next/navigation";
 import {
   listPostsByTag,
   pageFromSearchParams,
   queryFromSearchParams,
-} from "@/lib/posts";
-import { notFound } from "next/navigation";
+} from "@/lib/queries/posts";
+import PostFeed from "@/components/post/post-feed";
 
-type TagPageProps = {
+interface TagPageProps {
   params: Promise<{ tag: string }>;
   searchParams: Promise<{ page?: string | string[]; q?: string | string[] }>;
-};
+}
 
 export async function generateMetadata({ params }: TagPageProps) {
   const { tag } = await params;
@@ -19,8 +19,10 @@ export async function generateMetadata({ params }: TagPageProps) {
 export default async function TagPage({ params, searchParams }: TagPageProps) {
   const { tag } = await params;
   const { page: pageParam, q } = await searchParams;
+
   const name = decodeURIComponent(tag);
   const query = queryFromSearchParams(q);
+
   const result = await listPostsByTag(
     name,
     pageFromSearchParams(pageParam),

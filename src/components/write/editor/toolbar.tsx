@@ -1,6 +1,21 @@
 import CategoryField from "./category-field";
 import TagField from "./tag-field";
 
+interface WriteToolbarProps {
+  categories: string[];
+  category: string;
+  title: string;
+  tags: string[];
+  thumbnail: string;
+  pending: boolean;
+  onCategory: (value: string) => void;
+  onTitle: (value: string) => void;
+  onTags: (tags: string[]) => void;
+  onThumbnail: () => void;
+  onImage: () => void;
+  onDraft: () => void;
+}
+
 export default function WriteToolbar({
   categories,
   category,
@@ -14,20 +29,7 @@ export default function WriteToolbar({
   onThumbnail,
   onImage,
   onDraft,
-}: {
-  categories: string[];
-  category: string;
-  title: string;
-  tags: string[];
-  thumbnail: string;
-  pending: boolean;
-  onCategory: (value: string) => void;
-  onTitle: (value: string) => void;
-  onTags: (tags: string[]) => void;
-  onThumbnail: () => void;
-  onImage: () => void;
-  onDraft: () => void;
-}) {
+}: WriteToolbarProps) {
   return (
     <div className="flex flex-wrap items-center gap-3 border-b border-line px-4 py-3">
       <CategoryField

@@ -1,24 +1,21 @@
 "use client";
 
+import type { CommentThread } from "@/lib/queries/comments";
 import { useState } from "react";
+import { formatDate } from "@/lib/shared/format-date";
 import { deleteCommentAction } from "@/lib/actions/comments";
-import { formatDate } from "@/lib/format-date";
-import type { CommentThread } from "@/lib/comments";
 import CommentForm from "@/components/comment/comment-form";
 
 type Item = CommentThread | CommentThread["replies"][number];
 
-function CommentItem({
-  comment,
-  postId,
-  isAdmin,
-  isReply,
-}: {
+interface CommentItemProps {
   comment: Item;
   postId: string;
   isAdmin: boolean;
   isReply?: boolean;
-}) {
+}
+
+function CommentItem({ comment, postId, isAdmin, isReply }: CommentItemProps) {
   const [replyOpen, setReplyOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
 

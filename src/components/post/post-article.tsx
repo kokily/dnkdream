@@ -1,16 +1,20 @@
-import { auth } from "@/auth";
-import { formatDate } from "@/lib/format-date";
-import { renderMarkdownWithToc } from "@/lib/markdown-server";
-import { getPostBySlug } from "@/lib/posts";
-import PostAdminActions from "@/components/post/post-admin-actions";
-import PostToc from "@/components/post/post-toc";
 import Image from "next/image";
 import Link from "next/link";
+import { auth } from "@/auth";
+import { formatDate } from "@/lib/shared/format-date";
+import { renderMarkdownWithToc } from "@/lib/server/markdown-server";
+import { getPostBySlug } from "@/lib/queries/posts";
+import PostAdminActions from "@/components/post/post-admin-actions";
+import PostToc from "@/components/post/post-toc";
 import TagLink from "./tag-link";
 
 type Post = NonNullable<Awaited<ReturnType<typeof getPostBySlug>>>;
 
-export default async function PostArticle({ post }: { post: Post }) {
+interface PostArticleProps {
+  post: Post;
+}
+
+export default async function PostArticle({ post }: PostArticleProps) {
   const session = await auth();
   const { html, toc } = await renderMarkdownWithToc(post.body);
   const isAdmin = !!session?.user;

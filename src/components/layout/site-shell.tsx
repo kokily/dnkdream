@@ -1,11 +1,11 @@
-import SiteHeader from "@/components/layout/site-header";
 import { auth } from "@/auth";
+import SiteHeader from "@/components/layout/site-header";
 
-export default async function SiteShell({
-  children,
-}: {
+interface SiteShellProps {
   children: React.ReactNode;
-}) {
+}
+
+export default async function SiteShell({ children }: SiteShellProps) {
   const session = await auth();
 
   return (

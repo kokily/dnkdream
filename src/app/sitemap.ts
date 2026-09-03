@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { listCategories, listPublishedForSitemap, listTags } from "@/lib/posts";
+import { listCategories, listPublishedForSitemap, listTags } from "@/lib/queries/posts";
 
 const site = "https://dnkdream.com";
 

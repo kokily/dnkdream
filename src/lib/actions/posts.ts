@@ -1,11 +1,11 @@
 "use server";
 
-import { auth } from "@/auth";
-import { slugifyTitle } from "../slug";
-import { prisma } from "../db";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { deleteImages, imageKeysFromPost } from "../storage";
+import { prisma } from "@/lib/server/db";
+import { auth } from "@/auth";
+import { deleteImages, imageKeysFromPost } from "@/lib/server/storage";
+import { slugifyTitle } from "@/lib/shared/slug";
 
 function parseTags(value: string) {
   return value

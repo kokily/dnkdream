@@ -4,15 +4,16 @@ import {
   listPosts,
   pageFromSearchParams,
   queryFromSearchParams,
-} from "@/lib/posts";
+} from "@/lib/queries/posts";
 
-type HomePageProps = {
+interface HomePageProps {
   searchParams: Promise<{ page?: string | string[]; q?: string | string[] }>;
-};
+}
 
 export default async function HomePage({ searchParams }: HomePageProps) {
   const { page: pageParam, q } = await searchParams;
   const query = queryFromSearchParams(q);
+
   const [result, categories] = await Promise.all([
     listPosts(pageFromSearchParams(pageParam), query),
     listCategories(),

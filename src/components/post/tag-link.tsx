@@ -3,7 +3,11 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-export default function TagLink({ name }: { name: string }) {
+interface TagLinkProps {
+  name: string;
+}
+
+export default function TagLink({ name }: TagLinkProps) {
   const pathname = usePathname();
   const href = `/tag/${encodeURIComponent(name)}`;
   const current = decodeURIComponent(pathname);

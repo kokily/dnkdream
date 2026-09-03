@@ -1,11 +1,11 @@
-import SiteHeader from "@/components/layout/site-header";
 import { auth } from "@/auth";
+import SiteHeader from "@/components/layout/site-header";
 
-export default async function WriteShell({
-  children,
-}: {
+interface WriteShellProps {
   children: React.ReactNode;
-}) {
+}
+
+export default async function WriteShell({ children }: WriteShellProps) {
   const session = await auth();
 
   return (

@@ -1,14 +1,19 @@
 "use client";
 
-import {
-  useLayoutEffect,
-  useRef,
-  type ClipboardEvent,
-  type KeyboardEvent,
-  type RefObject,
-  type UIEvent,
-} from "react";
-import { caretOffsetTop } from "./caret";
+import type { ClipboardEvent, KeyboardEvent, RefObject } from "react";
+import { useBodyPane } from "../hooks/use-body-pane";
+
+interface WriteBodyPane {
+  textareaRef: RefObject<HTMLTextAreaElement | null>;
+  body: string;
+  preview: string;
+  thumbnail: string;
+  dragging: boolean;
+  onChange: (value: string) => void;
+  onPaste: (event: ClipboardEvent<HTMLTextAreaElement>) => void;
+  onKeyDown: (event: KeyboardEvent<HTMLTextAreaElement>) => void;
+  onClearThumbnail: () => void;
+}
 
 export default function WriteBodyPane({
   textareaRef,
@@ -20,60 +25,11 @@ export default function WriteBodyPane({
   onPaste,
   onKeyDown,
   onClearThumbnail,
-}: {
-  textareaRef: RefObject<HTMLTextAreaElement | null>;
-  body: string;
-  preview: string;
-  thumbnail: string;
-  dragging: boolean;
-  onChange: (value: string) => void;
-  onPaste: (event: ClipboardEvent<HTMLTextAreaElement>) => void;
-  onKeyDown: (event: KeyboardEvent<HTMLTextAreaElement>) => void;
-  onClearThumbnail: () => void;
-}) {
-  const previewRef = useRef<HTMLDivElement>(null);
-  const syncing = useRef(false);
-
-  function syncFrom(source: HTMLElement, target: HTMLElement) {
-    if (syncing.current) return;
-
-    const sourceMax = source.scrollHeight - source.clientHeight;
-    const targetMax = target.scrollHeight - target.clientHeight;
-
-    if (sourceMax <= 0 || targetMax <= 0) return;
-
-    syncing.current = true;
-    target.scrollTop = (source.scrollTop / sourceMax) * targetMax;
-    requestAnimationFrame(() => {
-      syncing.current = false;
-    });
-  }
-
-  function followCaret() {
-    const editor = textareaRef.current;
-    const previewEl = previewRef.current;
-    if (!editor) return;
-
-    const caretTop = caretOffsetTop(editor);
-    const nextTop = caretTop - editor.clientHeight * 0.38;
-    editor.scrollTop = Math.max(0, nextTop);
-
-    if (previewEl) syncFrom(editor, previewEl);
-  }
-
-  useLayoutEffect(() => {
-    followCaret();
-  }, [body]);
-
-  function onEditorScroll(event: UIEvent<HTMLTextAreaElement>) {
-    const previewEl = previewRef.current;
-    if (previewEl) syncFrom(event.currentTarget, previewEl);
-  }
-
-  function onPreviewScroll(event: UIEvent<HTMLDivElement>) {
-    const editor = textareaRef.current;
-    if (editor) syncFrom(event.currentTarget, editor);
-  }
+}: WriteBodyPane) {
+  const { onEditorScroll, previewRef, onPreviewScroll } = useBodyPane({
+    body,
+    textareaRef,
+  });
 
   return (
     <>
@@ -82,7 +38,7 @@ export default function WriteBodyPane({
           ref={textareaRef}
           name="body"
           value={body}
-          onChange={(event) => onChange(event.target.value)}
+          onChange={(e) => onChange(e.target.value)}
           onPaste={onPaste}
           onKeyDown={onKeyDown}
           onScroll={onEditorScroll}

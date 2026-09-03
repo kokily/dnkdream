@@ -1,12 +1,12 @@
-import WriteForm from "@/components/write/write-form";
-import { getPostById, listAllCategories } from "@/lib/posts";
 import { notFound } from "next/navigation";
+import { getPostById, listAllCategories } from "@/lib/queries/posts";
+import WriteForm from "@/components/write/write-form";
 
-export default async function EditWritePage({
-  params,
-}: {
+interface EditWritePageProps {
   params: Promise<{ id: string }>;
-}) {
+}
+
+export default async function EditWritePage({ params }: EditWritePageProps) {
   const { id } = await params;
   const [post, categories] = await Promise.all([
     getPostById(id),

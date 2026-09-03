@@ -2,15 +2,17 @@
 
 import { useMemo, useState } from "react";
 
+interface CategoryFieldProps {
+  categories: string[];
+  value: string;
+  onChange: (value: string) => void;
+}
+
 export default function CategoryField({
   categories,
   value,
   onChange,
-}: {
-  categories: string[];
-  value: string;
-  onChange: (value: string) => void;
-}) {
+}: CategoryFieldProps) {
   const [open, setOpen] = useState(false);
 
   const options = useMemo(() => {
